@@ -1438,7 +1438,7 @@ serial_pci_matches(const struct pciserial_board *board,
 }
 
 struct serial_private *
-adv_pciserial_init_ports(struct pci_dev *dev, const struct pciserial_board *board)
+adv950_uart_pci_init_ports(struct pci_dev *dev, const struct pciserial_board *board)
 {
 	struct uart_port serial_port;
 	struct serial_private *priv;
@@ -1494,7 +1494,7 @@ adv_pciserial_init_ports(struct pci_dev *dev, const struct pciserial_board *boar
 		       serial_port.iobase, serial_port.irq, serial_port.iotype);
 #endif
 
-		priv->line[i] = adv_serial8250_register_port(&serial_port);
+		priv->line[i] = adv950_uart_register_port(&serial_port);
 		//printk("port->unused[0] = %d\n",serial_port.unused[0]);
 		if (priv->line[i] < 0) {
 			printk(KERN_WARNING "Couldn't register serial port %s: %d\n", pci_name(dev), priv->line[i]);
@@ -1512,12 +1512,12 @@ err_out:
 }
 
 
-void adv_pciserial_remove_ports(struct serial_private *priv)
+void adv950_uart_pci_remove_ports(struct serial_private *priv)
 {
 	struct pci_serial_quirk *quirk;
 	int i;
 	for (i = 0; i < priv->nr; i++)
-		adv_serial8250_unregister_port(priv->line[i]);
+		adv950_uart_unregister_port(priv->line[i]);
 
 	for (i = 0; i < PCI_NUM_BAR_RESOURCES; i++) {
 		if (priv->remapped_bar[i])
@@ -1536,17 +1536,17 @@ void adv_pciserial_remove_ports(struct serial_private *priv)
 }
 
 
-void adv_pciserial_suspend_ports(struct serial_private *priv)
+void adv950_uart_pci_suspend_ports(struct serial_private *priv)
 {
 	int i;
 
 	for (i = 0; i < priv->nr; i++)
 		if (priv->line[i] >= 0)
-			adv_serial8250_suspend_port(priv->line[i]);
+			adv950_suspend_port(priv->line[i]);
 }
 
 
-void adv_pciserial_resume_ports(struct serial_private *priv)
+void adv950_uart_pci_resume_ports(struct serial_private *priv)
 {
 	int i;
 
@@ -1558,7 +1558,7 @@ void adv_pciserial_resume_ports(struct serial_private *priv)
 
 	for (i = 0; i < priv->nr; i++)
 		if (priv->line[i] >= 0)
-			adv_serial8250_resume_port(priv->line[i]);
+			adv950_resume_port(priv->line[i]);
 }
 
 
@@ -1615,7 +1615,7 @@ pciserial_init_one(struct pci_dev *dev, const struct pci_device_id *ent)
 				    dev);
 	}
 
-	priv = adv_pciserial_init_ports(dev, board);
+	priv = adv950_uart_pci_init_ports(dev, board);
 	if (!IS_ERR(priv)) {
 		pci_set_drvdata(dev, priv);
 		return 0;
@@ -1634,7 +1634,7 @@ static void pciserial_remove_one(struct pci_dev *dev)
 
 	pci_set_drvdata(dev, NULL);
 
-	adv_pciserial_remove_ports(priv);
+	adv950_uart_pci_remove_ports(priv);
 
 	pci_disable_device(dev);
 }
@@ -1668,7 +1668,7 @@ static int pciserial_resume_one(struct pci_dev *dev)
 		/* FIXME: We cannot simply error out here */
 		if (err)
 			printk(KERN_ERR "pciserial: Unable to re-enable ports, trying to continue.\n");
-		adv_pciserial_resume_ports(priv);
+		adv950_uart_pci_resume_ports(priv);
 	}
 	return 0;
 }
@@ -1818,7 +1818,7 @@ static struct pci_driver serial_pci_driver = {
 	.id_table	= serial_pci_tbl,
 };
 
-static int __init adv_serial8250_pci_init(void)
+static int __init adv950_uart_pci_init(void)
 {
 	printk("\n");
 	printk("==========================================================="
@@ -1849,23 +1849,23 @@ static int __init adv_serial8250_pci_init(void)
 	printk("Advantech Industrial Automation Group.\n"); 
 	printk("==========================================================="
 	       "====\n");
-	if(adv_serial8250_init() >= 0)
+	if(adv950_uart_init() >= 0)
 		return pci_register_driver(&serial_pci_driver);
 	return -ENODEV;
 }
 
-static void __exit adv_serial8250_pci_exit(void)
+static void __exit adv950_uart_pci_exit(void)
 {
 	pci_unregister_driver(&serial_pci_driver);
-	adv_serial8250_exit();
+	adv950_uart_exit();
 }
-EXPORT_SYMBOL_GPL(adv_pciserial_remove_ports);
-EXPORT_SYMBOL_GPL(adv_pciserial_suspend_ports);
-EXPORT_SYMBOL_GPL(adv_pciserial_resume_ports);
-EXPORT_SYMBOL_GPL(adv_pciserial_init_ports);
+EXPORT_SYMBOL_GPL(adv950_uart_pci_remove_ports);
+EXPORT_SYMBOL_GPL(adv950_uart_pci_suspend_ports);
+EXPORT_SYMBOL_GPL(adv950_uart_pci_resume_ports);
+EXPORT_SYMBOL_GPL(adv950_uart_pci_init_ports);
 
-module_init(adv_serial8250_pci_init);
-module_exit(adv_serial8250_pci_exit);
+module_init(adv950_uart_pci_init);
+module_exit(adv950_uart_pci_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Generic 8250/16x50 PCI serial probe module");

@@ -194,7 +194,7 @@ static DEFINE_MUTEX(hash_mutex);	/* Used to walk the hash */
 /*
  * Here we define the default xmit fifo size used for each type of UART.
  */
-static const struct serial8250_config uart_config[] = {
+static const struct adv950_uart_config uart_config[] = {
 	[PORT_UNKNOWN] = {
 		.name		= "unknown",
 		.fifo_size	= 1,
@@ -1603,7 +1603,7 @@ static void transmit_chars(struct uart_adv950_port *up)
 	}
 
 	if (uart_circ_chars_pending(xmit) < WAKEUP_CHARS)
-		adv_uart_write_wakeup(&up->port);
+		adv950_uart_write_wakeup(&up->port);
 
 	DEBUG_INTR("THRE...");
 
@@ -2904,7 +2904,7 @@ static void __init adv950_register_ports(struct uart_driver *drv)
 		up->mcr_mask = ~ALPHA_KLUDGE_MCR;
 		up->mcr_force = ALPHA_KLUDGE_MCR;
 
-		adv_uart_add_one_port(drv, &up->port);
+		adv950_uart_add_one_port(drv, &up->port);
 	}
 }
 
@@ -2972,7 +2972,7 @@ int __init early_serial_setup(struct uart_port *port)
  */
 void adv950_suspend_port(int line)
 {
-	adv_uart_suspend_port(&adv950_reg, &adv950_ports[line].port);
+	adv950_uart_suspend_port(&adv950_reg, &adv950_ports[line].port);
 }
 
 /**
@@ -2994,7 +2994,7 @@ void adv950_resume_port(int line)
 		serial_outp(up, UART_LCR, 0);
 		up->port.uartclk = 921600*16;
 	}
-	adv_uart_resume_port(&adv950_reg, &up->port);
+	adv950_uart_resume_port(&adv950_reg, &up->port);
 }
 
 
@@ -3020,7 +3020,7 @@ static struct uart_adv950_port *adv950_find_match_or_unused(struct uart_port *po
 	 * First, find a port entry which matches.
 	 */
 	for (i = 0; i < nr_uarts; i++)
-		if (adv_uart_match_port(&adv950_ports[i].port, port))
+		if (adv950_uart_match_port(&adv950_ports[i].port, port))
 			return &adv950_ports[i];
 
 	/*
@@ -3059,7 +3059,7 @@ static struct uart_adv950_port *adv950_find_match_or_unused(struct uart_port *po
  *
  *	On success the port is ready to use and the line number is returned.
  */
-extern void uart_configure_port(struct uart_driver *drv, struct uart_state *state,
+extern void adv950_uart_configure_port(struct uart_driver *drv, struct uart_state *state,
 		    struct uart_port *port);
 int adv950_register_port(struct uart_port *port)
 {
@@ -3105,7 +3105,7 @@ int adv950_register_port(struct uart_port *port)
 			uart->port.set_termios = port->set_termios;
 		if (port->pm)
 			uart->port.pm = port->pm;	
-		uart_configure_port(&adv950_reg, uart->port.state, &uart->port);
+		adv950_uart_configure_port(&adv950_reg, uart->port.state, &uart->port);
 		//if (ret == 0)
 		ret = uart->port.line;
 	}
@@ -3127,13 +3127,13 @@ void adv950_unregister_port(int line)
 	struct uart_adv950_port *uart = &adv950_ports[line];
 
 	mutex_lock(&serial_mutex);
-	adv_uart_remove_one_port(&adv950_reg, &uart->port);
+	adv950_uart_remove_one_port(&adv950_reg, &uart->port);
 	if (adv950_isa_devs) {
 		uart->port.flags &= ~UPF_BOOT_AUTOCONF;
 		uart->port.type = PORT_UNKNOWN;
 		uart->port.dev = &adv950_isa_devs->dev;
 		uart->capabilities = uart_config[uart->port.type].flags;
-		adv_uart_add_one_port(&adv950_reg, &uart->port);
+		adv950_uart_add_one_port(&adv950_reg, &uart->port);
 	} else {
 		uart->port.dev = NULL;
 	}
@@ -3153,7 +3153,7 @@ int adv950_init(void)
 		share_irqs ? "en" : "dis");
 
 	adv950_reg.nr = UART_NR;
-	ret = adv_uart_register_driver(&adv950_reg);
+	ret = adv950_uart_register_driver(&adv950_reg);
 
 	if (ret)
 		goto out;
@@ -3174,10 +3174,10 @@ void __exit adv950_exit(void)
 	{
 		state = ((struct uart_driver*)(&adv950_reg))->state + ((struct uart_port *)(&adv950_ports[i].port))->line;
 		if (state->uart_port != NULL)
-			adv_uart_remove_one_port(&adv950_reg, &adv950_ports[i].port);
+			adv950_uart_remove_one_port(&adv950_reg, &adv950_ports[i].port);
 	}
 
-	adv_uart_unregister_driver(&adv950_reg);
+	adv950_uart_unregister_driver(&adv950_reg);
 }
 
 EXPORT_SYMBOL(adv950_unregister_port);

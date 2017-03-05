@@ -61,7 +61,7 @@ static void uart_change_pm(struct uart_state *state, int pm_state);
  * This routine is used by the interrupt handler to schedule processing in
  * the software interrupt portion of the driver.
  */
-void adv_uart_write_wakeup(struct uart_port *port)
+void adv950_uart_write_wakeup(struct uart_port *port)
 {
 	struct uart_state *state = port->state;
 	/*
@@ -259,7 +259,7 @@ static void uart_shutdown(struct tty_struct *tty, struct uart_state *state)
  *	reflect the actual hardware settings.
  */
 void
-adv_uart_update_timeout(struct uart_port *port, unsigned int cflag,
+adv950_uart_update_timeout(struct uart_port *port, unsigned int cflag,
 		    unsigned int baud)
 {
 	unsigned int bits;
@@ -297,7 +297,7 @@ adv_uart_update_timeout(struct uart_port *port, unsigned int cflag,
 	port->timeout = (HZ * bits) / baud + HZ/50;
 }
 
-EXPORT_SYMBOL(adv_uart_update_timeout);
+EXPORT_SYMBOL(adv950_uart_update_timeout);
 
 /**
  *	uart_get_baud_rate - return baud rate for a particular port
@@ -319,7 +319,7 @@ EXPORT_SYMBOL(adv_uart_update_timeout);
  *	where B0 is requested ("hang up").
  */
 unsigned int
-adv_uart_get_baud_rate(struct uart_port *port, struct ktermios *termios,
+adv950_uart_get_baud_rate(struct uart_port *port, struct ktermios *termios,
 		   struct ktermios *old, unsigned int min, unsigned int max)
 {
 	unsigned int try, baud, altbaud = 38400;
@@ -388,7 +388,7 @@ adv_uart_get_baud_rate(struct uart_port *port, struct ktermios *termios,
 	return 0;
 }
 
-EXPORT_SYMBOL(adv_uart_get_baud_rate);
+EXPORT_SYMBOL(adv950_uart_get_baud_rate);
 
 /**
  *	uart_get_divisor - return uart clock divisor
@@ -398,7 +398,7 @@ EXPORT_SYMBOL(adv_uart_get_baud_rate);
  *	Calculate the uart clock divisor for the port.
  */
 unsigned int
-adv_uart_get_divisor(struct uart_port *port, unsigned int baud)
+adv950_uart_get_divisor(struct uart_port *port, unsigned int baud)
 {
 	unsigned int quot;
 
@@ -413,7 +413,7 @@ adv_uart_get_divisor(struct uart_port *port, unsigned int baud)
 	return quot;
 }
 
-EXPORT_SYMBOL(adv_uart_get_divisor);
+EXPORT_SYMBOL(adv950_uart_get_divisor);
 
 /* FIXME: Consistent locking policy */
 static void uart_change_speed(struct tty_struct *tty, struct uart_state *state,
@@ -1696,7 +1696,7 @@ static const struct file_operations uart_proc_fops = {
  *	@count: number of characters in string to write
  *	@write: function to write character to port
  */
-void adv_uart_console_write(struct uart_port *port, const char *s,
+void adv950_uart_console_write(struct uart_port *port, const char *s,
 			unsigned int count,
 			void (*putchar)(struct uart_port *, int))
 {
@@ -1745,7 +1745,7 @@ uart_get_console(struct uart_port *ports, int nr, struct console *co)
  *	eg: 115200n8r
  */
 void
-adv_uart_parse_options(char *options, int *baud, int *parity, int *bits, int *flow)
+adv950_uart_parse_options(char *options, int *baud, int *parity, int *bits, int *flow)
 {
 	char *s = options;
 
@@ -1791,7 +1791,7 @@ static const struct baud_rates baud_rates[] = {
  *	@flow: flow control character - 'r' (rts)
  */
 int
-adv_uart_set_options(struct uart_port *port, struct console *co,
+adv950_uart_set_options(struct uart_port *port, struct console *co,
 		 int baud, int parity, int bits, int flow)
 {
 	struct ktermios termios;
@@ -1880,7 +1880,7 @@ static int serial_match_port(struct device *dev, void *data)
 	return dev->devt == devt; /* Actually, only one tty per port */
 }
 
-int adv_uart_suspend_port(struct uart_driver *drv, struct uart_port *uport)
+int adv950_uart_suspend_port(struct uart_driver *drv, struct uart_port *uport)
 {
 	struct uart_state *state = drv->state + uport->line;
 	struct tty_port *port = &state->port;
@@ -1946,7 +1946,7 @@ int adv_uart_suspend_port(struct uart_driver *drv, struct uart_port *uport)
 	return 0;
 }
 
-int adv_uart_resume_port(struct uart_driver *drv, struct uart_port *uport)
+int adv950_uart_resume_port(struct uart_driver *drv, struct uart_port *uport)
 {
 	struct uart_state *state = drv->state + uport->line;
 	struct tty_port *port = &state->port;
@@ -2059,7 +2059,7 @@ uart_report_port(struct uart_driver *drv, struct uart_port *port)
 
 
  void
-uart_configure_port(struct uart_driver *drv, struct uart_state *state,
+adv950_uart_configure_port(struct uart_driver *drv, struct uart_state *state,
 		    struct uart_port *port)
 {
 	unsigned int flags;
@@ -2144,8 +2144,8 @@ static int uart_poll_init(struct tty_driver *driver, int line, char *options)
 		return -1;
 
 	if (options) {
-		adv_uart_parse_options(options, &baud, &parity, &bits, &flow);
-		return adv_uart_set_options(port, NULL, baud, parity, bits, flow);
+		adv950_uart_parse_options(options, &baud, &parity, &bits, &flow);
+		return adv950_uart_set_options(port, NULL, baud, parity, bits, flow);
 	}
 
 	return 0;
@@ -2229,7 +2229,7 @@ static const struct tty_port_operations uart_port_ops = {
  *	drv->port should be NULL, and the per-port structures should be
  *	registered using uart_add_one_port after this call has succeeded.
  */
-int adv_uart_register_driver(struct uart_driver *drv)
+int adv950_uart_register_driver(struct uart_driver *drv)
 {
 	struct tty_driver *normal;
 	int i, retval;
@@ -2297,7 +2297,7 @@ out:
  *	uart_remove_one_port() if it registered them with uart_add_one_port().
  *	(ie, drv->port == NULL)
  */
-void adv_uart_unregister_driver(struct uart_driver *drv)
+void adv950_uart_unregister_driver(struct uart_driver *drv)
 {
 	struct tty_driver *p = drv->tty_driver;
 	tty_unregister_driver(p);
@@ -2323,7 +2323,7 @@ struct tty_driver *uart_console_device(struct console *co, int *index)
  *	level uart drivers to expand uart_port, rather than having yet
  *	more levels of structures.
  */
-int adv_uart_add_one_port(struct uart_driver *drv, struct uart_port *uport)
+int adv950_uart_add_one_port(struct uart_driver *drv, struct uart_port *uport)
 {
 	struct uart_state *state;
 	struct tty_port *port;
@@ -2360,7 +2360,7 @@ int adv_uart_add_one_port(struct uart_driver *drv, struct uart_port *uport)
 		lockdep_set_class(&uport->lock, &port_lock_key);
 	}
 
-	uart_configure_port(drv, state, uport);
+	adv950_uart_configure_port(drv, state, uport);
 
 	/*
 	 * Register the port whether it's detected or not.  This allows
@@ -2395,7 +2395,7 @@ int adv_uart_add_one_port(struct uart_driver *drv, struct uart_port *uport)
  *	core driver.  No further calls will be made to the low-level code
  *	for this port.
  */
-int adv_uart_remove_one_port(struct uart_driver *drv, struct uart_port *uport)
+int adv950_uart_remove_one_port(struct uart_driver *drv, struct uart_port *uport)
 {
 	struct uart_state *state = drv->state + uport->line;
 	struct tty_port *port = &state->port;
@@ -2444,7 +2444,7 @@ int adv_uart_remove_one_port(struct uart_driver *drv, struct uart_port *uport)
 /*
  *	Are the two ports equivalent?
  */
-int adv_uart_match_port(struct uart_port *port1, struct uart_port *port2)
+int adv950_uart_match_port(struct uart_port *port1, struct uart_port *port2)
 {
 	if (port1->iotype != port2->iotype)
 		return 0;
@@ -2463,17 +2463,17 @@ int adv_uart_match_port(struct uart_port *port1, struct uart_port *port2)
 	}
 	return 0;
 }
-EXPORT_SYMBOL_GPL(adv_uart_console_write);
-EXPORT_SYMBOL_GPL(adv_uart_parse_options);
-EXPORT_SYMBOL_GPL(adv_uart_set_options);
-EXPORT_SYMBOL(adv_uart_match_port);
-EXPORT_SYMBOL(adv_uart_write_wakeup);
-EXPORT_SYMBOL(adv_uart_register_driver);
-EXPORT_SYMBOL(adv_uart_unregister_driver);
-EXPORT_SYMBOL(adv_uart_suspend_port);
-EXPORT_SYMBOL(adv_uart_resume_port);
-EXPORT_SYMBOL(adv_uart_add_one_port);
-EXPORT_SYMBOL(adv_uart_remove_one_port);
+EXPORT_SYMBOL_GPL(adv950_uart_console_write);
+EXPORT_SYMBOL_GPL(adv950_uart_parse_options);
+EXPORT_SYMBOL_GPL(adv950_uart_set_options);
+EXPORT_SYMBOL(adv950_uart_match_port);
+EXPORT_SYMBOL(adv950_uart_write_wakeup);
+EXPORT_SYMBOL(adv950_uart_register_driver);
+EXPORT_SYMBOL(adv950_uart_unregister_driver);
+EXPORT_SYMBOL(adv950_uart_suspend_port);
+EXPORT_SYMBOL(adv950_uart_resume_port);
+EXPORT_SYMBOL(adv950_uart_add_one_port);
+EXPORT_SYMBOL(adv950_uart_remove_one_port);
 
 MODULE_DESCRIPTION("Advantech Serial driver core");
 MODULE_LICENSE("GPL");
