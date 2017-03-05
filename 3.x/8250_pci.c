@@ -1023,7 +1023,7 @@ enum pci_board_num_t {
  * see first lines of serial_in() and serial_out() in 8250.c
 */
 
-static struct pciserial_board pci_boards[] __devinitdata = {
+static struct pciserial_board pci_boards[] = {
 	[pbn_default] = {
 		.flags		= FL_BASE0,
 		.num_ports	= 1,
@@ -1347,7 +1347,7 @@ static const struct pci_device_id softmodem_blacklist[] = {
  * guess what the configuration might be, based on the pitiful PCI
  * serial specs.  Returns 0 on success, 1 on failure.
  */
-static int __devinit
+static int
 serial_pci_guess_board(struct pci_dev *dev, struct pciserial_board *board)
 {
 	const struct pci_device_id *blacklist;
@@ -1566,7 +1566,7 @@ void adv_pciserial_resume_ports(struct serial_private *priv)
  * Probe one serial board.  Unfortunately, there is no rhyme nor reason
  * to the arrangement of serial ports on a PCI card.
  */
-static int __devinit
+static int
 pciserial_init_one(struct pci_dev *dev, const struct pci_device_id *ent)
 {
 	struct serial_private *priv;
@@ -1628,7 +1628,7 @@ pciserial_init_one(struct pci_dev *dev, const struct pci_device_id *ent)
 	return rc;
 }
 
-static void __devexit pciserial_remove_one(struct pci_dev *dev)
+static void pciserial_remove_one(struct pci_dev *dev)
 {
 	struct serial_private *priv = pci_get_drvdata(dev);
 
@@ -1810,7 +1810,7 @@ static struct pci_device_id serial_pci_tbl[] = {
 static struct pci_driver serial_pci_driver = {
 	.name		= "advserial",
 	.probe		= pciserial_init_one,
-	.remove		= __devexit_p(pciserial_remove_one),
+	.remove		= pciserial_remove_one,
 #ifdef CONFIG_PM
 	.suspend	= pciserial_suspend_one,
 	.resume		= pciserial_resume_one,
