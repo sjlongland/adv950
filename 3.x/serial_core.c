@@ -1171,7 +1171,7 @@ static void uart_set_ldisc(struct tty_struct *tty)
 	struct uart_port *uport = state->uart_port;
 
 	if (uport->ops->set_ldisc)
-		uport->ops->set_ldisc(uport, tty->termios.c_line);
+		uport->ops->set_ldisc(uport, &tty->termios);
 }
 
 static void uart_set_termios(struct tty_struct *tty,
