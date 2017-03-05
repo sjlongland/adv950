@@ -390,16 +390,12 @@ static const u8
 
 static inline int map_8250_in_reg(struct uart_port *p, int offset)
 {
-	if (p->iotype != UPIO_RM9000)
-		return offset;
-	return regmap_in[offset];
+	return offset;
 }
 
 static inline int map_8250_out_reg(struct uart_port *p, int offset)
 {
-	if (p->iotype != UPIO_RM9000)
-		return offset;
-	return regmap_out[offset];
+	return offset;
 }
 
 #else
@@ -505,7 +501,6 @@ static void set_io_from_upio(struct uart_port *p)
 		p->serial_out = mem_serial_out;
 		break;
 
-	case UPIO_RM9000:
 	case UPIO_MEM32:
 		p->serial_in = mem32_serial_in;
 		p->serial_out = mem32_serial_out;
@@ -642,20 +637,12 @@ static void serial_dl_write(struct uart_adv950_port *up, int value)
 #elif defined(CONFIG_SERIAL_8250_RM9K)
 static int serial_dl_read(struct uart_adv950_port *up)
 {
-	return	(up->port.iotype == UPIO_RM9000) ?
-		(((__raw_readl(up->port.membase + 0x10) << 8) |
-		(__raw_readl(up->port.membase + 0x08) & 0xff)) & 0xffff) :
-		_serial_dl_read(up);
+	return	_serial_dl_read(up);
 }
 
 static void serial_dl_write(struct uart_adv950_port *up, int value)
 {
-	if (up->port.iotype == UPIO_RM9000) {
-		__raw_writel(value, up->port.membase + 0x08);
-		__raw_writel(value >> 8, up->port.membase + 0x10);
-	} else {
-		_serial_dl_write(up, value);
-	}
+	_serial_dl_write(up, value);
 }
 #else
 #define serial_dl_read(up) _serial_dl_read(up)
