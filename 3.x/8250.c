@@ -1527,7 +1527,7 @@ ignore_char:
 	} while ((lsr & (UART_LSR_DR | UART_LSR_BI)) && (max_count-- > 0));
    }
 	spin_unlock(&up->port.lock);
-	tty_flip_buffer_push(tty);
+	tty_flip_buffer_push(tty->port);
 	spin_lock(&up->port.lock);
 	*status = lsr;
 }
