@@ -1456,7 +1456,7 @@ receive_chars(struct uart_adv950_port *up, unsigned int *status)
 		flags = readl(up->port.membase + DMASTA);
     	} while (flags & DMAACT);
 
-	tty_insert_flip_string(tty, (unsigned char *)up->rx_ring, count);
+	tty_insert_flip_string(tty->port, (unsigned char *)up->rx_ring, count);
 	up->port.icount.rx += count;
    }
    else
