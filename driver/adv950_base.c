@@ -3006,7 +3006,7 @@ void adv950_resume_port(int line)
 static struct platform_device *adv950_isa_devs;
 
 /*
- * adv950_register_port and adv950_unregister_port allows for
+ * adv950_uart_register_port and adv950_uart_unregister_port allows for
  * 16x50 serial ports to be configured at run-time, to support PCMCIA
  * modems and PCI multiport cards.
  */
@@ -3047,7 +3047,7 @@ static struct uart_adv950_port *adv950_find_match_or_unused(struct uart_port *po
 }
 
 /**
- *	adv950_register_port - register a serial port
+ *	adv950_uart_register_port - register a serial port
  *	@port: serial port template
  *
  *	Configure the serial port specified by the request. If the
@@ -3061,7 +3061,7 @@ static struct uart_adv950_port *adv950_find_match_or_unused(struct uart_port *po
  */
 extern void adv950_uart_configure_port(struct uart_driver *drv, struct uart_state *state,
 		    struct uart_port *port);
-int adv950_register_port(struct uart_port *port)
+int adv950_uart_register_port(struct uart_port *port)
 {
 	struct uart_adv950_port *uart;
 	int ret = -ENOSPC;
@@ -3116,13 +3116,13 @@ int adv950_register_port(struct uart_port *port)
 
 
 /**
- *	adv950_unregister_port - remove a 16x50 serial port at runtime
+ *	adv950_uart_unregister_port - remove a 16x50 serial port at runtime
  *	@line: serial line number
  *
  *	Remove one serial port.  This may not be called from interrupt
  *	context.  We hand the port back to the our control.
  */
-void adv950_unregister_port(int line)
+void adv950_uart_unregister_port(int line)
 {
 	struct uart_adv950_port *uart = &adv950_ports[line];
 
@@ -3141,7 +3141,7 @@ void adv950_unregister_port(int line)
 }
 
 
-int adv950_init(void)
+int adv950_uart_init(void)
 {
 	int ret;
 
@@ -3166,7 +3166,7 @@ out:
 	return ret;
 }
 
-void __exit adv950_exit(void)
+void __exit adv950_uart_exit(void)
 {
 	int i;
 	struct uart_state *state; 
@@ -3180,8 +3180,8 @@ void __exit adv950_exit(void)
 	adv950_uart_unregister_driver(&adv950_reg);
 }
 
-EXPORT_SYMBOL(adv950_unregister_port);
-EXPORT_SYMBOL(adv950_register_port);
+EXPORT_SYMBOL(adv950_uart_unregister_port);
+EXPORT_SYMBOL(adv950_uart_register_port);
 EXPORT_SYMBOL(adv950_do_pm);
 EXPORT_SYMBOL(adv950_do_set_termios);
 EXPORT_SYMBOL(adv950_suspend_port);
