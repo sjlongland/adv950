@@ -19,9 +19,11 @@ $ make modules M=/path/to/adv950/driver
 With luck, you should find a `adv950.ko` file in `/path/to/adv950/driver`.
 
 Create the directory `/lib/modules/$( uname -r )/extra` and plop that `.ko`
-file in it, then run `depmod -a` on the device.  Fingers crossed, you should
-be able to `modprobe` the driver at boot and it should work.  The devices
-appear as `/dev/ttyAPx` device nodes, and `dmesg` looks like this:
+file in it, then run `depmod -a`.  Fingers crossed, you should be able to
+`modprobe` the driver and it should work.  I find the `udev` subsystem
+autodetects the serial device and attempts to load the driver at boot.
+
+The devices appear as `/dev/ttyAPx` device nodes, and `dmesg` looks like this:
 
 ```
 Mar  5 06:31:58 vk4msl-router kernel: adv950: loading out-of-tree module taints kernel.
@@ -59,6 +61,8 @@ Mar  5 06:31:58 vk4msl-router kernel: , function 0, port 1, RS232
 Mar  5 06:31:58 vk4msl-router kernel:
 Mar  5 06:31:58 vk4msl-router kernel: ttyAP1 at I/O 0xee00 (irq = 7) is a 16C950/954
 ```
+
+Status as of 2017-03-05: The driver loads, device nodes appear, but not much else.
 
  -- Stuart Longland <stuartl@longlandclan.id.au>
 
