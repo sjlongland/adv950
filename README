@@ -1,3 +1,33 @@
+This is a port of the Advantech driver to modern (>=3.19) kernels.   As such,
+it should be noted that this driver comes with absolutely no warranty.
+
+Furthermore, I have given no consideration to support for older kernels, nor
+has this been thoroughly tested.  If it builds, consider yourself lucky.
+
+I'll be adding further notes here as I get more things working.  Long term,
+I'd like to see this code cleaned up and merged into the standard `8250`
+serial driver from which it forked (a long time ago by the looks of things).
+
+Building procedures, get your kernel sources prepared (`make menuconfig`,
+followed by perhaps `make bzImage modules` or maybe `make modules_prepare`),
+then in the kernel source tree, run:
+
+```
+$ make modules M=/path/to/adv950/driver
+```
+
+With luck, you should find a `adv950.ko` file in `/path/to/adv950/driver`.
+
+Create the directory `/lib/modules/$( uname -r )/extra` and plop that `.ko`
+file in it, then run `depmod -a` on the device.  Fingers crossed, you should
+be able to `modprobe` the driver at boot and it should work.
+
+ -- Stuart Longland <stuartl@longlandclan.id.au>
+
+The original README is below.
+
+-----------------------------------------------------------------------------
+
 =============================================================================
 	   ADVANTECH industrial comunication cards device driver
 			 Installation Guide
