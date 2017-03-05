@@ -1443,7 +1443,7 @@ receive_chars(struct uart_adv950_port *up, unsigned int *status)
 	serial_out(up, UART_ICR, up->acr);
 	count  = (up->port.fifosize < save_rfl)? up->port.fifosize: save_rfl;
 	//ensure tty core has enough space
-	count  = tty_buffer_request_room(tty, count);
+	count  = tty_buffer_request_room(tty->port, count);
 
 	//printk(KERN_INFO "RFL=%d,count=%d,", save_rfl, count);
 	//firstly clear DMA status register
