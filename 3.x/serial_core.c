@@ -1404,9 +1404,9 @@ static void uart_wait_until_sent(struct tty_struct *tty, int timeout)
 	struct uart_state *state = tty->driver_data;
 	struct uart_port *port = state->uart_port;
 
-	tty_lock();
+	tty_lock(tty);
 	__uart_wait_until_sent(port, timeout);
-	tty_unlock();
+	tty_unlock(tty);
 }
 
 /*
