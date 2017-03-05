@@ -3153,7 +3153,7 @@ int adv950_uart_init(void)
 		share_irqs ? "en" : "dis");
 
 	adv950_reg.nr = UART_NR;
-	ret = adv950_uart_register_driver(&adv950_reg);
+	ret = uart_register_driver(&adv950_reg);
 
 	if (ret)
 		goto out;
@@ -3177,7 +3177,7 @@ void __exit adv950_uart_exit(void)
 			adv950_uart_remove_one_port(&adv950_reg, &adv950_ports[i].port);
 	}
 
-	adv950_uart_unregister_driver(&adv950_reg);
+	uart_unregister_driver(&adv950_reg);
 }
 
 EXPORT_SYMBOL(adv950_uart_unregister_port);
