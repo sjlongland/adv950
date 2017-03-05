@@ -20,7 +20,45 @@ With luck, you should find a `adv950.ko` file in `/path/to/adv950/driver`.
 
 Create the directory `/lib/modules/$( uname -r )/extra` and plop that `.ko`
 file in it, then run `depmod -a` on the device.  Fingers crossed, you should
-be able to `modprobe` the driver at boot and it should work.
+be able to `modprobe` the driver at boot and it should work.  The devices
+appear as `/dev/ttyAPx` device nodes, and `dmesg` looks like this:
+
+```
+Mar  5 06:31:58 vk4msl-router kernel: adv950: loading out-of-tree module taints kernel.
+Mar  5 06:31:58 vk4msl-router kernel:
+Mar  5 06:31:58 vk4msl-router kernel: ===============================================================
+Mar  5 06:31:58 vk4msl-router kernel: Advantech PCI-954/952/16C950 Device Drivers. V3.33 [11/07/2011]
+Mar  5 06:31:58 vk4msl-router kernel: Supports: RS232/422/485 auto detection and setting
+Mar  5 06:31:58 vk4msl-router kernel: Devices:  UNO:  UNO2050 [COM3/COM4]
+Mar  5 06:31:58 vk4msl-router kernel:                 UNO2059 [COM1~COM4]
+Mar  5 06:31:58 vk4msl-router kernel:                 UNOB-2201CB [COM1~COM8]
+Mar  5 06:31:58 vk4msl-router kernel:                 UNOB-2176 [COM1~COM4]
+Mar  5 06:31:58 vk4msl-router kernel:                 UNO-1150 [COM2/COM3]
+Mar  5 06:31:58 vk4msl-router kernel:                 UNO-2679 [COM3~COM6]
+Mar  5 06:31:58 vk4msl-router kernel:                 UNO-4672 [COM3~COM10]
+Mar  5 06:31:58 vk4msl-router kernel:           ICOM: PCI-1601, PCI-1602\x0a                PCI-1603, PCI-1604\x0a         
+       PCI-1610, PCI-1612\x0a                PCI-1620, PCI-1622
+Mar  5 06:31:58 vk4msl-router kernel:           MIC:  MIC-3611, MIC-3612
+Mar  5 06:31:58 vk4msl-router kernel:                 MIC-3620, MIC-3621
+Mar  5 06:31:58 vk4msl-router kernel:           PCM:  PCM-3614P/I, PCM-3641P/I
+Mar  5 06:31:58 vk4msl-router kernel:                 PCM-3618P/I, PCM-3681P/I
+Mar  5 06:31:58 vk4msl-router kernel:       General:  A001, A002, A004
+Mar  5 06:31:58 vk4msl-router kernel:                 A101, A102, A104
+Mar  5 06:31:58 vk4msl-router kernel:                 F001, F002, F004
+Mar  5 06:31:58 vk4msl-router kernel:                 F101, F102, F104
+Mar  5 06:31:58 vk4msl-router kernel:                 A202, A304, A408
+Mar  5 06:31:58 vk4msl-router kernel: Advantech Industrial Automation Group.
+Mar  5 06:31:58 vk4msl-router kernel: ===============================================================
+Mar  5 06:31:58 vk4msl-router kernel: Serial: 8250/16550 driver, Max support 64 ports, IRQ sharing enabled
+Mar  5 06:31:58 vk4msl-router kernel: Advantech General COM Port Device
+Mar  5 06:31:58 vk4msl-router kernel: , function 0, port 0, RS232
+Mar  5 06:31:58 vk4msl-router kernel:
+Mar  5 06:31:58 vk4msl-router kernel: ttyAP0 at I/O 0xef00 (irq = 7) is a 16C950/954
+Mar  5 06:31:58 vk4msl-router kernel: Advantech General COM Port Device
+Mar  5 06:31:58 vk4msl-router kernel: , function 0, port 1, RS232
+Mar  5 06:31:58 vk4msl-router kernel:
+Mar  5 06:31:58 vk4msl-router kernel: ttyAP1 at I/O 0xee00 (irq = 7) is a 16C950/954
+```
 
  -- Stuart Longland <stuartl@longlandclan.id.au>
 
