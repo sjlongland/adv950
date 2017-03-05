@@ -24,7 +24,7 @@ SERIAL_FLAGS:= $(SERIAL_FLAGS)
 ifneq ($(KERNELRELEASE),)
 EXTRA_CFLAGS  = $(SERIAL_FLAGS)
 obj-m := adv950.o
-adv950-objs := 8250.o 8250_pci.o serial_core.o  
+adv950-objs := adv950_base.o adv950_pci.o adv950_core.o
 else
 	KDIR := /lib/modules/$(shell uname -r)/build/
 	PWD  := $(shell pwd)

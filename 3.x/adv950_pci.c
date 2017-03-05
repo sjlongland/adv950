@@ -42,7 +42,7 @@
 #include <asm/byteorder.h>
 #include <asm/io.h>
 
-#include "8250.h"
+#include "adv950_base.h"
 
 #undef SERIAL_DEBUG_PCI
 /*

@@ -45,7 +45,7 @@
 #include <asm/io.h>
 #include <asm/irq.h>
 
-#include "8250.h"
+#include "adv950_base.h"
 
 #ifdef CONFIG_SPARC
 #include "suncore.h"
