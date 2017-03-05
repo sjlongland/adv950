@@ -162,7 +162,7 @@ static int uart_startup(struct tty_struct *tty, struct uart_state *state, int in
 	retval = uport->ops->startup(uport);
 	if (retval == 0) {
 		if (uart_console(uport) && uport->cons->cflag) {
-			tty->termios->c_cflag = uport->cons->cflag;
+			tty->termios.c_cflag = uport->cons->cflag;
 			uport->cons->cflag = 0;
 		}
 		/*
@@ -175,7 +175,7 @@ static int uart_startup(struct tty_struct *tty, struct uart_state *state, int in
 			 * Setup the RTS and DTR signals once the
 			 * port is open and ready to respond.
 			 */
-			if (tty->termios->c_cflag & CBAUD)
+			if (tty->termios.c_cflag & CBAUD)
 				uart_set_mctrl(uport, TIOCM_RTS | TIOCM_DTR);
 		}
 
@@ -217,7 +217,7 @@ static void uart_shutdown(struct tty_struct *tty, struct uart_state *state)
 		/*
 		 * Turn off DTR and RTS early.
 		 */
-		if (!tty || (tty->termios->c_cflag & HUPCL))
+		if (!tty || (tty->termios.c_cflag & HUPCL))
 			uart_clear_mctrl(uport, TIOCM_DTR | TIOCM_RTS);
 
 		/*
@@ -421,31 +421,28 @@ static void uart_change_speed(struct tty_struct *tty, struct uart_state *state,
 {
 	struct tty_port *port = &state->port;
 	struct uart_port *uport = state->uart_port;
-	struct ktermios *termios;
 
 	/*
-	 * If we have no tty, termios, or the port does not exist,
+	 * If we have no tty or the port does not exist,
 	 * then we can't set the parameters for this port.
 	 */
-	if (!tty || !tty->termios || uport->type == PORT_UNKNOWN)
+	if (!tty || uport->type == PORT_UNKNOWN)
 		return;
-
-	termios = tty->termios;
 
 	/*
 	 * Set flags based on termios cflag
 	 */
-	if (termios->c_cflag & CRTSCTS)
+	if (tty->termios.c_cflag & CRTSCTS)
 		set_bit(ASYNCB_CTS_FLOW, &port->flags);
 	else
 		clear_bit(ASYNCB_CTS_FLOW, &port->flags);
 
-	if (termios->c_cflag & CLOCAL)
+	if (tty->termios.c_cflag & CLOCAL)
 		clear_bit(ASYNCB_CHECK_CD, &port->flags);
 	else
 		set_bit(ASYNCB_CHECK_CD, &port->flags);
 
-	uport->ops->set_termios(uport, termios, old_termios);
+	uport->ops->set_termios(uport, &tty->termios, old_termios);
 }
 
 static inline int __uart_put_char(struct uart_port *port,
@@ -601,7 +598,7 @@ static void uart_throttle(struct tty_struct *tty)
 	if (I_IXOFF(tty))
 		uart_send_xchar(tty, STOP_CHAR(tty));
 
-	if (tty->termios->c_cflag & CRTSCTS)
+	if (tty->termios.c_cflag & CRTSCTS)
 		uart_clear_mctrl(state->uart_port, TIOCM_RTS);
 }
 
@@ -617,7 +614,7 @@ static void uart_unthrottle(struct tty_struct *tty)
 			uart_send_xchar(tty, START_CHAR(tty));
 	}
 
-	if (tty->termios->c_cflag & CRTSCTS)
+	if (tty->termios.c_cflag & CRTSCTS)
 		uart_set_mctrl(port, TIOCM_RTS);
 }
 
@@ -1175,7 +1172,7 @@ static void uart_set_ldisc(struct tty_struct *tty)
 	struct uart_port *uport = state->uart_port;
 
 	if (uport->ops->set_ldisc)
-		uport->ops->set_ldisc(uport, tty->termios->c_line);
+		uport->ops->set_ldisc(uport, tty->termios.c_line);
 }
 
 static void uart_set_termios(struct tty_struct *tty,
@@ -1183,7 +1180,7 @@ static void uart_set_termios(struct tty_struct *tty,
 {
 	struct uart_state *state = tty->driver_data;
 	unsigned long flags;
-	unsigned int cflag = tty->termios->c_cflag;
+	unsigned int cflag = tty->termios.c_cflag;
 
 
 	/*
@@ -1194,9 +1191,9 @@ static void uart_set_termios(struct tty_struct *tty,
 	 */
 #define RELEVANT_IFLAG(iflag)	((iflag) & (IGNBRK|BRKINT|IGNPAR|PARMRK|INPCK))
 	if ((cflag ^ old_termios->c_cflag) == 0 &&
-	    tty->termios->c_ospeed == old_termios->c_ospeed &&
-	    tty->termios->c_ispeed == old_termios->c_ispeed &&
-	    RELEVANT_IFLAG(tty->termios->c_iflag ^ old_termios->c_iflag) == 0) {
+	    tty->termios.c_ospeed == old_termios->c_ospeed &&
+	    tty->termios.c_ispeed == old_termios->c_ispeed &&
+	    RELEVANT_IFLAG(tty->termios.c_iflag ^ old_termios->c_iflag) == 0) {
 		return;
 	}
 
@@ -1984,8 +1981,8 @@ int adv_uart_resume_port(struct uart_driver *drv, struct uart_port *uport)
 		/*
 		 * If that's unset, use the tty termios setting.
 		 */
-		if (port->tty && port->tty->termios && termios.c_cflag == 0)
-			termios = *(port->tty->termios);
+		if (port->tty && termios.c_cflag == 0)
+			termios = port->tty->termios;
 
 		uport->ops->set_termios(uport, &termios, NULL);
 		if (console_suspend_enabled)
